@@ -1,665 +1,745 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IndoVoice AI - Text to Speech</title>
-    
-    <!-- CSS Tailwind -->
+    <title>Indonesian AI Voice Generator</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- React & Babel -->
-    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    
-    <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        dark: {
+                            900: '#0f172a',
+                            800: '#1e293b',
+                            700: '#334155',
+                            600: '#475569',
+                        },
+                        brand: {
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                        }
+                    },
+                    animation: {
+                        'pulse-fast': 'pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom Scrollbar for a premium look */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #1e293b; }
+        ::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #64748b; }
+        
+        /* Range slider styling */
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 16px;
+            width: 16px;
+            border-radius: 50%;
+            background: #6366f1;
+            cursor: pointer;
+            margin-top: -6px;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            background: #334155;
+            border-radius: 2px;
+        }
+    </style>
 </head>
-<body class="bg-slate-50">
-    <div id="root"></div>
+<body class="bg-dark-900 text-slate-200 font-sans min-h-screen flex flex-col">
 
-    <script type="text/babel">
-        const { useState, useRef, useEffect } = React;
+    <header class="bg-dark-800 border-b border-dark-700 py-4 sticky top-0 z-10 shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="bg-brand-500 p-2 rounded-lg text-white">
+                    <i data-lucide="mic-2" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold text-white tracking-tight">Nusantara<span class="text-brand-500">Voice</span> AI</h1>
+                    <p class="text-xs text-slate-400">Professional Indonesian Text-to-Speech</p>
+                </div>
+            </div>
+            <div class="flex gap-4">
+                <button class="text-slate-400 hover:text-white transition-colors" title="Settings">
+                    <i data-lucide="settings" class="w-5 h-5"></i>
+                </button>
+            </div>
+        </div>
+    </header>
 
-        // --- CONFIGURATION & MAPPINGS ---
-        const VOICE_MAPPINGS = {
-          female: {
-            'Wanita Dewasa': 'Aoede',
-            'Wanita Muda': 'Callirrhoe',
-            'Wanita Remaja': 'Despina',
-            'Ibu': 'Erinome',
-            'Guru': 'Kore',
-            'Penyiar Radio': 'Leda',
-            'Narator Dokumenter': 'Laomedeia',
-            'Presenter Berita': 'Pulcherrima',
-            'Customer Service': 'Vindemiatrix',
-            'Story Teller': 'Charon',
-            'Gadis Ceria': 'Kore',
-            'Wanita Elegan': 'Aoede',
-            'Wanita Lembut': 'Erinome',
-            'Wanita Tegas': 'Pulcherrima',
-            'Wanita Serius': 'Leda'
-          },
-          male: {
-            'Pria Dewasa': 'Fenrir',
-            'Pria Muda': 'Zephyr',
-            'Ayah': 'Iapetus',
-            'Guru': 'Orus',
-            'Penyiar Radio': 'Puck',
-            'Presenter Berita': 'Rasalgethi',
-            'Narator Film': 'Schedar',
-            'Story Teller': 'Umbriel',
-            'Motivator': 'Algenib',
-            'Pria Tegas': 'Alnilam',
-            'Pria Santai': 'Zephyr',
-            'Pria Berwibawa': 'Fenrir',
-            'Pria Maskulin': 'Iapetus',
-            'Pria Lembut': 'Orus',
-            'Pria Serius': 'Schedar'
-          }
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full grid grid-cols-1 lg:grid-cols-12 gap-8">
+        
+        <div class="lg:col-span-7 flex flex-col gap-4">
+            <div class="bg-dark-800 rounded-2xl border border-dark-700 p-6 flex flex-col h-full shadow-sm">
+                <div class="flex justify-between items-center mb-4">
+                    <label for="textInput" class="text-sm font-semibold text-white flex items-center gap-2">
+                        <i data-lucide="align-left" class="w-4 h-4 text-brand-500"></i>
+                        Masukkan Narasi
+                    </label>
+                    <span class="text-xs text-slate-400 bg-dark-700 px-2 py-1 rounded-md" id="charCount">0 karakter</span>
+                </div>
+                <textarea id="textInput" class="flex-grow w-full bg-dark-900 border border-dark-600 rounded-xl p-4 text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent resize-none transition-all leading-relaxed" 
+                    placeholder="Tulis narasi yang ingin diubah menjadi suara...&#10;&#10;Contoh:&#10;Selamat datang di NusantaraVoice. Pada tahun 2026, teknologi AI akan semakin berkembang pesat! 😎"
+                    rows="12"></textarea>
+                
+                <div class="mt-4 flex flex-wrap gap-2 text-xs text-slate-400">
+                    <span class="flex items-center gap-1 bg-dark-700/50 px-2 py-1 rounded"><i data-lucide="check" class="w-3 h-3 text-emerald-400"></i> Paragraf Panjang</span>
+                    <span class="flex items-center gap-1 bg-dark-700/50 px-2 py-1 rounded"><i data-lucide="check" class="w-3 h-3 text-emerald-400"></i> Angka & Singkatan Natural</span>
+                    <span class="flex items-center gap-1 bg-dark-700/50 px-2 py-1 rounded"><i data-lucide="check" class="w-3 h-3 text-emerald-400"></i> Deteksi Dialog Otomatis</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="lg:col-span-5 flex flex-col gap-6">
+            
+            <div class="bg-dark-800 rounded-2xl border border-dark-700 p-6 shadow-sm">
+                <h3 class="text-sm font-semibold text-white flex items-center gap-2 mb-5">
+                    <i data-lucide="sliders" class="w-4 h-4 text-brand-500"></i>
+                    Konfigurasi Suara
+                </h3>
+
+                <div class="mb-5">
+                    <label class="block text-xs text-slate-400 mb-2">Karakter Suara</label>
+                    <div class="relative">
+                        <select id="voiceSelect" class="w-full bg-dark-900 border border-dark-600 rounded-lg py-2.5 pl-3 pr-10 text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-500 appearance-none">
+                            <optgroup label="👩 Wanita">
+                                <option value="female_dewasa">Wanita Dewasa</option>
+                                <option value="female_muda">Wanita Muda</option>
+                                <option value="female_remaja">Wanita Remaja</option>
+                                <option value="female_ibu">Ibu</option>
+                                <option value="female_guru">Guru (Wanita)</option>
+                                <option value="female_radio">Penyiar Radio (Wanita)</option>
+                                <option value="female_berita">Presenter Berita (Wanita)</option>
+                                <option value="female_cs">Customer Service</option>
+                                <option value="female_ceria">Gadis Ceria</option>
+                                <option value="female_elegan">Wanita Elegan</option>
+                                <option value="female_lembut">Wanita Lembut</option>
+                            </optgroup>
+                            <optgroup label="👨 Pria">
+                                <option value="male_dewasa">Pria Dewasa</option>
+                                <option value="male_muda">Pria Muda</option>
+                                <option value="male_ayah">Ayah</option>
+                                <option value="male_guru">Guru (Pria)</option>
+                                <option value="male_radio">Penyiar Radio (Pria)</option>
+                                <option value="male_berita">Presenter Berita (Pria)</option>
+                                <option value="male_dokumenter">Narator Dokumenter (Pria)</option>
+                                <option value="male_motivator">Motivator</option>
+                                <option value="male_tegas">Pria Tegas</option>
+                                <option value="male_wibawa">Pria Berwibawa</option>
+                                <option value="male_santai">Pria Santai</option>
+                            </optgroup>
+                        </select>
+                        <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 absolute right-3 top-3 pointer-events-none"></i>
+                    </div>
+                </div>
+
+                <div class="mb-5">
+                    <label class="block text-xs text-slate-400 mb-2">Vibe / Emosi</label>
+                    <div class="relative">
+                        <select id="vibeSelect" class="w-full bg-dark-900 border border-dark-600 rounded-lg py-2.5 pl-3 pr-10 text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-500 appearance-none">
+                            <option value="ceria">Ceria (Semangat, energik)</option>
+                            <option value="bahagia">Bahagia (Ramah, hangat)</option>
+                            <option value="sedih">Sedih (Emosional, pelan)</option>
+                            <option value="haru">Haru (Lembut, bergetar)</option>
+                            <option value="puitis">Puitis (Dramatis, penekanan)</option>
+                            <option value="misterius">Misterius (Dalam, lambat)</option>
+                            <option value="horor">Horor (Menegangkan, gelap)</option>
+                            <option value="romantis">Romantis (Lembut, penuh kasih)</option>
+                            <option value="heroik">Heroik (Tegas, lantang)</option>
+                            <option value="motivasi">Motivasi (Percaya diri, optimis)</option>
+                            <option value="berita">Berita (Formal, profesional)</option>
+                            <option value="dokumenter" selected>Dokumenter (Tenang, informatif)</option>
+                            <option value="cerita_anak">Cerita Anak (Lucu, ekspresif)</option>
+                            <option value="doa">Doa (Khusyuk, sopan)</option>
+                            <option value="podcast">Podcast (Santai, natural)</option>
+                        </select>
+                        <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 absolute right-3 top-3 pointer-events-none"></i>
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <div>
+                        <div class="flex justify-between text-xs mb-1">
+                            <span class="text-slate-400">Kecepatan Bicara</span>
+                            <span id="speedVal" class="text-white font-mono">1.0x</span>
+                        </div>
+                        <input type="range" id="speedSlider" min="0.5" max="2.0" step="0.1" value="1.0">
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-xs mb-1">
+                            <span class="text-slate-400">Pitch (Nada Suara)</span>
+                            <span id="pitchVal" class="text-white font-mono">0</span>
+                        </div>
+                        <input type="range" id="pitchSlider" min="-2" max="2" step="0.5" value="0">
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-xs mb-1">
+                            <span class="text-slate-400" title="Semakin tinggi semakin konsisten, semakin rendah semakin variatif">Stabilitas Suara</span>
+                            <span id="stabilityVal" class="text-white font-mono">75%</span>
+                        </div>
+                        <input type="range" id="stabilitySlider" min="0" max="100" step="5" value="75">
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-xs mb-1">
+                            <span class="text-slate-400" title="Intensitas emosi">Ekspresi Emosi</span>
+                            <span id="expressionVal" class="text-white font-mono">80%</span>
+                        </div>
+                        <input type="range" id="expressionSlider" min="0" max="100" step="5" value="80">
+                    </div>
+                </div>
+
+                <button id="generateBtn" class="w-full mt-6 bg-brand-600 hover:bg-brand-500 text-white font-semibold py-3 px-4 rounded-xl shadow-lg shadow-brand-500/20 transition-all flex items-center justify-center gap-2 group">
+                    <i data-lucide="sparkles" class="w-5 h-5 group-hover:animate-pulse"></i>
+                    <span>Generate Audio</span>
+                </button>
+                
+                <div id="statusMessage" class="hidden mt-3 text-sm p-3 rounded-lg flex items-center gap-2"></div>
+            </div>
+
+            <div id="outputCard" class="hidden bg-dark-800 rounded-2xl border border-dark-700 overflow-hidden shadow-sm flex-col">
+                <div class="p-6 border-b border-dark-700 bg-gradient-to-br from-dark-800 to-dark-900">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-sm font-semibold text-white flex items-center gap-2">
+                            <i data-lucide="radio" class="w-4 h-4 text-emerald-400"></i>
+                            Hasil Render Audio
+                        </h3>
+                        <span class="text-[10px] font-bold tracking-wider uppercase bg-emerald-500/10 text-emerald-400 px-2 py-1 rounded">Siap Diputar</span>
+                    </div>
+
+                    <div class="bg-dark-900 rounded-xl p-4 border border-dark-600 relative overflow-hidden">
+                        <canvas id="waveform" class="w-full h-16 mb-2"></canvas>
+                        
+                        <div class="flex items-center gap-4">
+                            <button id="playPauseBtn" class="w-10 h-10 rounded-full bg-brand-600 hover:bg-brand-500 flex items-center justify-center text-white transition-colors flex-shrink-0">
+                                <i data-lucide="play" id="playIcon" class="w-5 h-5 ml-1"></i>
+                                <i data-lucide="pause" id="pauseIcon" class="w-5 h-5 hidden"></i>
+                            </button>
+                            <div class="flex-grow flex flex-col gap-1">
+                                <input type="range" id="seekSlider" min="0" max="100" value="0" class="w-full h-1 bg-dark-600 rounded-lg appearance-none cursor-pointer">
+                                <div class="flex justify-between text-[10px] text-slate-400 font-mono">
+                                    <span id="currentTimeDisplay">00:00</span>
+                                    <span id="durationDisplay">00:00</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-1 group relative">
+                                <i data-lucide="volume-2" class="w-4 h-4 text-slate-400 cursor-pointer"></i>
+                                <input type="range" id="volumeSlider" min="0" max="1" step="0.05" value="1" class="w-16 hidden group-hover:block transition-all">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-6 bg-dark-800">
+                    <div class="grid grid-cols-2 gap-y-3 gap-x-4 mb-6">
+                        <div class="text-xs">
+                            <p class="text-slate-500 mb-0.5">Format</p>
+                            <p class="text-white font-medium flex items-center gap-1"><i data-lucide="file-audio" class="w-3 h-3"></i> WAV / PCM 16-bit</p>
+                        </div>
+                        <div class="text-xs">
+                            <p class="text-slate-500 mb-0.5">Sample Rate</p>
+                            <p class="text-white font-medium">24,000 Hz</p>
+                        </div>
+                        <div class="text-xs">
+                            <p class="text-slate-500 mb-0.5">Voice Profile</p>
+                            <p class="text-white font-medium" id="metaVoice">-</p>
+                        </div>
+                        <div class="text-xs">
+                            <p class="text-slate-500 mb-0.5">Vibe / Emosi</p>
+                            <p class="text-white font-medium capitalize" id="metaVibe">-</p>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-wrap gap-3">
+                        <button id="downloadWavBtn" class="flex-1 min-w-[120px] bg-slate-700 hover:bg-slate-600 text-white text-sm font-medium py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition-colors">
+                            <i data-lucide="download" class="w-4 h-4"></i> WAV
+                        </button>
+                        <button id="downloadMp3Btn" class="flex-1 min-w-[120px] bg-slate-700 hover:bg-slate-600 text-white text-sm font-medium py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition-colors" title="Download kompresi (Browser Export)">
+                            <i data-lucide="download" class="w-4 h-4"></i> MP3
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <audio id="nativeAudio" class="hidden"></audio>
+
+    <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        // State & DOM Elements
+        const textInput = document.getElementById('textInput');
+        const charCount = document.getElementById('charCount');
+        const generateBtn = document.getElementById('generateBtn');
+        const statusMessage = document.getElementById('statusMessage');
+        const outputCard = document.getElementById('outputCard');
+        
+        // Sliders
+        const speedSlider = document.getElementById('speedSlider');
+        const pitchSlider = document.getElementById('pitchSlider');
+        const stabilitySlider = document.getElementById('stabilitySlider');
+        const expressionSlider = document.getElementById('expressionSlider');
+        
+        // Audio Player DOM
+        const nativeAudio = document.getElementById('nativeAudio');
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        const playIcon = document.getElementById('playIcon');
+        const pauseIcon = document.getElementById('pauseIcon');
+        const seekSlider = document.getElementById('seekSlider');
+        const volumeSlider = document.getElementById('volumeSlider');
+        const currentTimeDisplay = document.getElementById('currentTimeDisplay');
+        const durationDisplay = document.getElementById('durationDisplay');
+        const canvas = document.getElementById('waveform');
+        const canvasCtx = canvas.getContext('2d');
+        
+        // Audio Context for Waveform Analysis
+        let audioCtx;
+        let analyser;
+        let source;
+        let animationId;
+        let currentAudioUrl = null;
+
+        // UI Event Listeners for Sliders
+        const updateVal = (slider, spanId, suffix = '') => {
+            document.getElementById(spanId).innerText = (slider.value > 0 && spanId === 'pitchVal' ? '+' : '') + slider.value + suffix;
+        };
+        speedSlider.addEventListener('input', (e) => { updateVal(e.target, 'speedVal', 'x'); nativeAudio.playbackRate = parseFloat(e.target.value); });
+        pitchSlider.addEventListener('input', (e) => updateVal(e.target, 'pitchVal'));
+        stabilitySlider.addEventListener('input', (e) => updateVal(e.target, 'stabilityVal', '%'));
+        expressionSlider.addEventListener('input', (e) => updateVal(e.target, 'expressionVal', '%'));
+        
+        textInput.addEventListener('input', (e) => {
+            charCount.innerText = `${e.target.value.length} karakter`;
+        });
+
+        // AI Logic: Mapping User Config to Prompt Instructions
+        const voiceMapping = {
+            "female_dewasa": { voice: "Aoede", desc: "seorang wanita dewasa profesional" },
+            "female_muda": { voice: "Kore", desc: "seorang wanita muda" },
+            "female_remaja": { voice: "Leda", desc: "seorang gadis remaja" },
+            "female_ibu": { voice: "Callirrhoe", desc: "seorang ibu yang keibuan dan penyayang" },
+            "female_guru": { voice: "Aoede", desc: "seorang guru wanita yang berwibawa" },
+            "female_radio": { voice: "Kore", desc: "seorang penyiar radio wanita yang asik" },
+            "female_berita": { voice: "Callirrhoe", desc: "seorang presenter berita TV wanita" },
+            "female_cs": { voice: "Leda", desc: "seorang customer service yang sangat ramah" },
+            "female_ceria": { voice: "Kore", desc: "seorang gadis yang sangat ceria" },
+            "female_elegan": { voice: "Aoede", desc: "seorang wanita yang elegan dan anggun" },
+            "female_lembut": { voice: "Callirrhoe", desc: "seorang wanita yang bertutur kata sangat lembut" },
+            
+            "male_dewasa": { voice: "Fenrir", desc: "seorang pria dewasa" },
+            "male_muda": { voice: "Zephyr", desc: "seorang pemuda" },
+            "male_ayah": { voice: "Orus", desc: "seorang ayah yang bijaksana" },
+            "male_guru": { voice: "Charon", desc: "seorang guru pria yang tegas" },
+            "male_radio": { voice: "Zephyr", desc: "seorang penyiar radio pria yang santai" },
+            "male_berita": { voice: "Fenrir", desc: "seorang presenter berita TV pria" },
+            "male_dokumenter": { voice: "Orus", desc: "seorang narator film dokumenter profesional" },
+            "male_motivator": { voice: "Charon", desc: "seorang motivator yang berapi-api" },
+            "male_tegas": { voice: "Fenrir", desc: "seorang pria dengan suara tegas dan lantang" },
+            "male_wibawa": { voice: "Orus", desc: "seorang pria yang sangat berwibawa dan tenang" },
+            "male_santai": { voice: "Zephyr", desc: "seorang pria yang santai dan bersahabat" }
         };
 
-        const VIBE_MAPPINGS = {
-          'Ceria': 'energetic, highly cheerful, and enthusiastic',
-          'Bahagia': 'warm, friendly, and smiling',
-          'Sedih': 'emotional, slightly slow, and touching',
-          'Haru': 'emotional, soft, with a trembling touching voice',
-          'Puitis': 'poetic, slow, dramatic, and expressive',
-          'Misterius': 'deep, slow, mysterious, and intriguing',
-          'Horor': 'tense, dark, slow, and scary',
-          'Romantis': 'soft, warm, intimate, and romantic',
-          'Heroik': 'loud, firm, brave, and heroic',
-          'Motivasi': 'confident, highly energetic, and optimistic',
-          'Berita': 'formal, very clear, objective, and professional',
-          'Dokumenter': 'calm, steady, informative, and natural',
-          'Cerita Anak': 'funny, highly expressive, and playful',
-          'Doa': 'very soft, respectful, and solemn',
-          'Dakwah': 'polite, calm, wise, and advising',
-          'Pengumuman': 'loud, clear, formal, and easy to understand',
-          'Podcast': 'relaxed, highly natural, and conversational'
+        const vibeMapping = {
+            "ceria": "dengan nada yang penuh semangat, tempo cepat, energik dan tersenyum",
+            "bahagia": "dengan nada yang ramah, hangat, dan sangat positif",
+            "sedih": "dengan nada yang pelan, emosional, sedikit terbata, dan menyedihkan",
+            "haru": "dengan nada lembut, suara bergetar, dan penuh keharuan",
+            "puitis": "dengan pembacaan perlahan, lembut, dramatis, dan penuh penekanan pada kata-kata",
+            "misterius": "dengan suara berat, lambat, dalam, dan membuat penasaran",
+            "horor": "dengan nada pelan, menegangkan, gelap, dan mengintimidasi",
+            "romantis": "dengan nada sangat lembut, hangat, dan penuh kasih sayang",
+            "heroik": "dengan suara tegas, lantang, berani dan penuh semangat juang",
+            "motivasi": "dengan nada percaya diri, energik, optimis, dan meyakinkan",
+            "berita": "dengan nada formal, jelas, objektif, dan profesional",
+            "dokumenter": "dengan nada tenang, informatif, natural, dan berwibawa",
+            "cerita_anak": "dengan nada lucu, sangat ekspresif, dan ceria seperti bercerita kepada anak-anak",
+            "doa": "dengan nada lembut, penuh kekhusyukan, pelan, dan sopan",
+            "podcast": "dengan gaya santai, natural, seperti berbicara langsung kepada pendengar"
         };
 
-        // --- HELPER FUNCTIONS ---
-        function base64ToUint8Array(base64) {
-          const binaryString = window.atob(base64);
-          const len = binaryString.length;
-          const bytes = new Uint8Array(len);
-          for (let i = 0; i < len; i++) {
-            bytes[i] = binaryString.charCodeAt(i);
-          }
-          return bytes;
-        }
-
-        function pcmToWav(pcmData, sampleRate = 24000) {
-          const numChannels = 1; 
-          const bitsPerSample = 16;
-          const byteRate = sampleRate * numChannels * (bitsPerSample / 8);
-          const blockAlign = numChannels * (bitsPerSample / 8);
-          const dataSize = pcmData.byteLength;
-          const buffer = new ArrayBuffer(44 + dataSize);
-          const view = new DataView(buffer);
-
-          const writeString = (view, offset, string) => {
-            for (let i = 0; i < string.length; i++) {
-              view.setUint8(offset + i, string.charCodeAt(i));
+        // Utility: Convert Base64 string from API to ArrayBuffer
+        function base64ToArrayBuffer(base64) {
+            const binaryString = window.atob(base64);
+            const len = binaryString.length;
+            const bytes = new Uint8Array(len);
+            for (let i = 0; i < len; i++) {
+                bytes[i] = binaryString.charCodeAt(i);
             }
-          };
-
-          writeString(view, 0, 'RIFF');
-          view.setUint32(4, 36 + dataSize, true);
-          writeString(view, 8, 'WAVE');
-          writeString(view, 12, 'fmt ');
-          view.setUint32(16, 16, true);
-          view.setUint16(20, 1, true);
-          view.setUint16(22, numChannels, true);
-          view.setUint32(24, sampleRate, true);
-          view.setUint32(28, byteRate, true);
-          view.setUint16(32, blockAlign, true);
-          view.setUint16(34, bitsPerSample, true);
-          writeString(view, 36, 'data');
-          view.setUint32(40, dataSize, true);
-
-          const pcmView = new Uint8Array(pcmData);
-          const targetView = new Uint8Array(buffer, 44);
-          targetView.set(pcmView);
-
-          return new Blob([buffer], { type: 'audio/wav' });
+            return bytes.buffer;
         }
 
-        function formatBytes(bytes, decimals = 2) {
-          if (!+bytes) return '0 Bytes';
-          const k = 1024;
-          const dm = decimals < 0 ? 0 : decimals;
-          const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-          const i = Math.floor(Math.log(bytes) / Math.log(k));
-          return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
+        // Utility: Convert raw PCM16 buffer to valid WAV blob
+        function createWavBlob(pcmArrayBuffer, sampleRate = 24000) {
+            const numChannels = 1;
+            const bitsPerSample = 16;
+            const byteRate = sampleRate * numChannels * (bitsPerSample / 8);
+            const blockAlign = numChannels * (bitsPerSample / 8);
+            const dataSize = pcmArrayBuffer.byteLength;
+            
+            const buffer = new ArrayBuffer(44 + dataSize);
+            const view = new DataView(buffer);
+            
+            function writeString(view, offset, string) {
+                for (let i = 0; i < string.length; i++) {
+                    view.setUint8(offset + i, string.charCodeAt(i));
+                }
+            }
+            
+            writeString(view, 0, 'RIFF');
+            view.setUint32(4, 36 + dataSize, true); // file size - 8
+            writeString(view, 8, 'WAVE');
+            
+            writeString(view, 12, 'fmt ');
+            view.setUint32(16, 16, true); // size of fmt chunk
+            view.setUint16(20, 1, true); // PCM format
+            view.setUint16(22, numChannels, true);
+            view.setUint32(24, sampleRate, true);
+            view.setUint32(28, byteRate, true);
+            view.setUint16(32, blockAlign, true);
+            view.setUint16(34, bitsPerSample, true);
+            
+            writeString(view, 36, 'data');
+            view.setUint32(40, dataSize, true);
+            
+            // Append raw PCM data
+            const pcmView = new Uint8Array(pcmArrayBuffer);
+            const wavView = new Uint8Array(buffer, 44);
+            wavView.set(pcmView);
+            
+            return new Blob([buffer], { type: 'audio/wav' });
         }
 
+        // Delay function for exponential backoff
+        const delay = ms => new Promise(res => setTimeout(res, ms));
+
+        // Format time in mm:ss
         function formatTime(seconds) {
-          if (isNaN(seconds)) return "00:00";
-          const m = Math.floor(seconds / 60);
-          const s = Math.floor(seconds % 60);
-          return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+            if (isNaN(seconds) || !isFinite(seconds)) return "00:00";
+            const m = Math.floor(seconds / 60);
+            const s = Math.floor(seconds % 60);
+            return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
         }
 
-        // --- MAIN COMPONENT ---
-        function App() {
-          // Input States
-          const [text, setText] = useState('');
-          const [gender, setGender] = useState('female');
-          const [persona, setPersona] = useState('Wanita Dewasa');
-          const [vibe, setVibe] = useState('Podcast');
-          
-          // Audio Setting States
-          const [speed, setSpeed] = useState(1.0);
-          const [pitch, setPitch] = useState(0);
-          const [volume, setVolume] = useState(100);
-          const [expression, setExpression] = useState(80);
+        function showMessage(msg, type = 'error') {
+            statusMessage.innerHTML = type === 'error' 
+                ? `<i data-lucide="alert-circle" class="w-4 h-4 text-red-400"></i> <span class="text-red-400">${msg}</span>` 
+                : `<i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i> <span class="text-emerald-400">${msg}</span>`;
+            statusMessage.classList.remove('hidden', 'bg-red-900/20', 'bg-emerald-900/20');
+            statusMessage.classList.add(type === 'error' ? 'bg-red-900/20' : 'bg-emerald-900/20');
+            lucide.createIcons();
+        }
 
-          // Process States
-          const [isLoading, setIsLoading] = useState(false);
-          const [error, setError] = useState('');
-          
-          // Output States
-          const [audioUrl, setAudioUrl] = useState(null);
-          const [audioBlob, setAudioBlob] = useState(null);
-          const [audioMeta, setAudioMeta] = useState(null);
-          const [isPlaying, setIsPlaying] = useState(false);
-          const [currentTime, setCurrentTime] = useState(0);
-          const [duration, setDuration] = useState(0);
-
-          const audioRef = useRef(null);
-
-          // Update persona when gender changes
-          useEffect(() => {
-            const defaultPersona = gender === 'female' ? 'Wanita Dewasa' : 'Pria Dewasa';
-            setPersona(defaultPersona);
-          }, [gender]);
-
-          // Handle Audio Player Events
-          useEffect(() => {
-            const audio = audioRef.current;
-            if (!audio) return;
-
-            const handleTimeUpdate = () => setCurrentTime(audio.currentTime);
-            const handleLoadedMetadata = () => setDuration(audio.duration);
-            const handleEnded = () => setIsPlaying(false);
-
-            audio.addEventListener('timeupdate', handleTimeUpdate);
-            audio.addEventListener('loadedmetadata', handleLoadedMetadata);
-            audio.addEventListener('ended', handleEnded);
-
-            return () => {
-              audio.removeEventListener('timeupdate', handleTimeUpdate);
-              audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
-              audio.removeEventListener('ended', handleEnded);
-            };
-          }, [audioUrl]);
-
-          const togglePlayPause = () => {
-            if (!audioRef.current) return;
-            if (isPlaying) {
-              audioRef.current.pause();
-            } else {
-              audioRef.current.play();
-            }
-            setIsPlaying(!isPlaying);
-          };
-
-          const handleSeek = (e) => {
-            if (!audioRef.current) return;
-            const time = Number(e.target.value);
-            audioRef.current.currentTime = time;
-            setCurrentTime(time);
-          };
-
-          // Generate Audio Function
-          const handleGenerate = async () => {
-            if (!text.trim()) {
-              setError("Silakan masukkan narasi terlebih dahulu.");
-              return;
+        // Main Generation Function
+        generateBtn.addEventListener('click', async () => {
+            const rawText = textInput.value.trim();
+            if (!rawText) {
+                showMessage("Mohon masukkan teks narasi terlebih dahulu.");
+                return;
             }
 
-            setIsLoading(true);
-            setError('');
-            setAudioUrl(null);
-            setIsPlaying(false);
-            setCurrentTime(0);
-
-            const selectedVoiceId = VOICE_MAPPINGS[gender][persona];
-            const vibeInstruction = VIBE_MAPPINGS[vibe];
+            const voiceKey = document.getElementById('voiceSelect').value;
+            const vibeKey = document.getElementById('vibeSelect').value;
             
-            let paceInstruction = speed > 1.2 ? "fast pace" : speed < 0.8 ? "slow pace" : "normal pace";
-            let pitchInstruction = pitch > 0.5 ? "higher pitch" : pitch < -0.5 ? "lower pitch" : "natural pitch";
+            const selectedVoice = voiceMapping[voiceKey];
+            const selectedVibeDesc = vibeMapping[vibeKey];
             
-            const promptText = `Please speak the following Indonesian text with a ${vibeInstruction} tone. 
-        Speak at a ${paceInstruction} and ${pitchInstruction}. 
-        Read numbers, abbreviations, and symbols naturally in formal Indonesian.
-        Expression intensity level: ${expression}%.
-        Text: ${text}`;
+            const stabilityVal = document.getElementById('stabilitySlider').value;
+            const expressionVal = document.getElementById('expressionSlider').value;
+            const pitchVal = document.getElementById('pitchSlider').value;
 
-            try {
-              // --- PENTING UNTUK HOSTING SENDIRI ---
-              // Isi string kosong ini dengan API Key Anda dari aistudio.google.com
-              const apiKey = ""; 
-              // -------------------------------------
-              
-              const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=${apiKey}`;
+            let pitchModifier = "";
+            if (pitchVal > 0) pitchModifier = "with a slightly higher pitch, ";
+            if (pitchVal < 0) pitchModifier = "with a slightly lower pitch, ";
 
-              const payload = {
-                contents: [{ parts: [{ text: promptText }] }],
+            let stabilityModifier = "";
+            if (stabilityVal > 80) stabilityModifier = "Keep tone highly stable and consistent. ";
+            if (stabilityVal < 40) stabilityModifier = "Allow dynamic and varied vocal fluctuations. ";
+
+            let expressionModifier = "";
+            if (expressionVal > 80) expressionModifier = "Maximum emotional expression. ";
+            if (expressionVal < 40) expressionModifier = "Subdued and minimal emotional expression. ";
+
+            const constructedPrompt = `Speak completely in Indonesian. Act as ${selectedVoice.desc} and speak ${selectedVibeDesc}. ${pitchModifier}${stabilityModifier}${expressionModifier}Read abbreviations naturally and pronounce numbers correctly in Indonesian. Text to speak: "${rawText}"`;
+
+            // UI Loading State
+            generateBtn.disabled = true;
+            generateBtn.innerHTML = `<i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i> Sedang membuat suara...`;
+            statusMessage.classList.add('hidden');
+            outputCard.classList.add('hidden');
+            lucide.createIcons();
+            
+            if (currentAudioUrl) {
+                URL.revokeObjectURL(currentAudioUrl);
+                currentAudioUrl = null;
+            }
+
+            const payload = {
+                contents: [{
+                    parts: [{ text: constructedPrompt }]
+                }],
                 generationConfig: {
-                  responseModalities: ["AUDIO"],
-                  speechConfig: {
-                    voiceConfig: { prebuiltVoiceConfig: { voiceName: selectedVoiceId } }
-                  }
+                    responseModalities: ["AUDIO"],
+                    speechConfig: {
+                        voiceConfig: {
+                            prebuiltVoiceConfig: {
+                                voiceName: selectedVoice.voice
+                            }
+                        }
+                    }
                 },
                 model: "gemini-2.5-flash-preview-tts"
-              };
+            };
 
-              let retries = 5;
-              let delay = 1000;
-              let response;
-              let responseData;
+            // MENGGUNAKAN URL WORKER ANDA
+            const url = "https://tts.aromkeyapi.workers.dev/"; 
+            
+            let attempts = 0;
+            const maxRetries = 5;
+            const baseDelay = 1000;
+            let resultData = null;
 
-              while (retries > 0) {
-                response = await fetch(url, {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify(payload)
-                });
+            while (attempts <= maxRetries) {
+                try {
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
 
-                if (response.ok) {
-                   responseData = await response.json();
-                   break;
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    resultData = await response.json();
+                    break; // Success
+                } catch (error) {
+                    attempts++;
+                    if (attempts > maxRetries) {
+                        showMessage("Gagal membuat audio setelah beberapa kali percobaan. Silakan coba lagi nanti.");
+                        resetGenerateBtn();
+                        return;
+                    }
+                    await delay(baseDelay * Math.pow(2, attempts - 1));
                 }
-
-                retries--;
-                if (retries === 0) throw new Error(`API Error: ${response.status}`);
-                await new Promise(r => setTimeout(r, delay));
-                delay *= 2;
-              }
-
-              if (!responseData?.candidates?.[0]?.content?.parts?.[0]?.inlineData) {
-                throw new Error("Gagal mendapatkan data audio dari server.");
-              }
-
-              const inlineData = responseData.candidates[0].content.parts[0].inlineData;
-              const base64Audio = inlineData.data;
-              
-              const pcmBytes = base64ToUint8Array(base64Audio);
-              const wavBlob = pcmToWav(pcmBytes.buffer, 24000); 
-              const wavUrl = URL.createObjectURL(wavBlob);
-
-              setAudioBlob(wavBlob);
-              setAudioUrl(wavUrl);
-              
-              setAudioMeta({
-                voice: selectedVoiceId,
-                vibe: vibe,
-                size: formatBytes(wavBlob.size),
-                sampleRate: '24,000 Hz',
-                format: 'WAV (PCM 16-bit Mono)'
-              });
-              
-              setTimeout(() => {
-                if(audioRef.current) {
-                  audioRef.current.volume = volume / 100;
-                }
-              }, 100);
-
-            } catch (err) {
-              console.error(err);
-              setError(`Terjadi kesalahan: ${err.message}. Pastikan koneksi stabil & API Key valid.`);
-            } finally {
-              setIsLoading(false);
             }
-          };
 
-          const handleDownloadWav = () => {
-            if (!audioUrl) return;
-            const a = document.createElement('a');
-            a.href = audioUrl;
-            a.download = `IndoVoice_${persona.replace(/\s+/g, '')}_${vibe}_${new Date().getTime()}.wav`;
-            a.click();
-          };
-
-          return (
-            <div className="min-h-screen bg-slate-50 text-slate-900 font-sans p-4 sm:p-6 lg:p-8 pb-24">
-              
-              {/* Header */}
-              <header className="max-w-6xl mx-auto mb-8 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="bg-indigo-600 w-12 h-12 flex items-center justify-center rounded-xl text-white shadow-lg shadow-indigo-200">
-                    <i className="fa-solid fa-microphone text-xl"></i>
-                  </div>
-                  <div>
-                    <h1 className="text-2xl font-bold text-slate-800 tracking-tight">IndoVoice AI</h1>
-                    <p className="text-sm text-slate-500 font-medium">Generator Audio Bahasa Indonesia Natural</p>
-                  </div>
-                </div>
-              </header>
-
-              {/* Main Layout */}
-              <main className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
+            try {
+                // Extract base64 PCM data
+                const base64PcmData = resultData.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
                 
-                {/* Left Column: Input & Settings */}
-                <div className="lg:col-span-7 space-y-6">
-                  
-                  <section className="bg-white rounded-3xl shadow-sm border border-slate-200 p-6">
-                    <div className="flex justify-between items-end mb-3">
-                      <label className="block text-sm font-bold text-slate-800">Masukkan Narasi</label>
-                      <span className="text-xs font-medium text-slate-400">{text.length} karakter</span>
-                    </div>
-                    <textarea
-                      value={text}
-                      onChange={(e) => setText(e.target.value)}
-                      placeholder="Tulis narasi yang ingin diubah menjadi suara. Contoh: Pada tahun 2026, teknologi AI akan semakin berkembang pesat..."
-                      className="w-full h-48 p-4 bg-slate-50/50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all resize-y text-slate-700 text-sm leading-relaxed"
-                    />
-                    <div className="mt-4 flex flex-wrap gap-2 text-xs font-medium text-slate-600">
-                      <span className="flex items-center bg-slate-100 px-2.5 py-1.5 rounded-lg"><i className="fa-solid fa-circle-check text-indigo-500 mr-1.5"></i> Angka dibaca natural</span>
-                      <span className="flex items-center bg-slate-100 px-2.5 py-1.5 rounded-lg"><i className="fa-solid fa-circle-check text-indigo-500 mr-1.5"></i> Paragraf panjang didukung</span>
-                      <span className="flex items-center bg-slate-100 px-2.5 py-1.5 rounded-lg"><i className="fa-solid fa-circle-check text-indigo-500 mr-1.5"></i> Emoji diabaikan</span>
-                    </div>
-                  </section>
+                if (!base64PcmData) {
+                    throw new Error("Respons API tidak valid: Tidak ada data audio.");
+                }
 
-                  <section className="bg-white rounded-3xl shadow-sm border border-slate-200 p-6 grid grid-cols-1 md:grid-cols-2 gap-8">
-                    
-                    <div className="space-y-5">
-                      <div>
-                        <label className="block text-sm font-bold text-slate-800 mb-3">Gender Suara</label>
-                        <div className="flex gap-2 p-1 bg-slate-100 rounded-xl">
-                          <button 
-                            onClick={() => setGender('female')}
-                            className={`flex-1 py-2.5 px-4 rounded-lg text-sm font-semibold transition-all ${gender === 'female' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
-                          >
-                            Wanita
-                          </button>
-                          <button 
-                            onClick={() => setGender('male')}
-                            className={`flex-1 py-2.5 px-4 rounded-lg text-sm font-semibold transition-all ${gender === 'male' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
-                          >
-                            Pria
-                          </button>
-                        </div>
-                      </div>
-                      
-                      <div>
-                        <label className="block text-sm font-bold text-slate-800 mb-3">Karakter Suara</label>
-                        <select 
-                          value={persona}
-                          onChange={(e) => setPersona(e.target.value)}
-                          className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-indigo-500 outline-none cursor-pointer"
-                        >
-                          {Object.keys(VOICE_MAPPINGS[gender]).map(p => (
-                            <option key={p} value={p}>{p}</option>
-                          ))}
-                        </select>
-                      </div>
+                // Convert to WAV
+                const pcmBuffer = base64ToArrayBuffer(base64PcmData);
+                const wavBlob = createWavBlob(pcmBuffer, 24000); // 24kHz is standard for Gemini TTS
+                
+                currentAudioUrl = URL.createObjectURL(wavBlob);
+                nativeAudio.src = currentAudioUrl;
+                
+                // Apply speed setting
+                nativeAudio.playbackRate = parseFloat(speedSlider.value);
 
-                      <div>
-                        <label className="block text-sm font-bold text-slate-800 mb-3">Emosi (Vibe)</label>
-                        <select 
-                          value={vibe}
-                          onChange={(e) => setVibe(e.target.value)}
-                          className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-indigo-500 outline-none cursor-pointer"
-                        >
-                          {Object.keys(VIBE_MAPPINGS).map(v => (
-                            <option key={v} value={v}>{v}</option>
-                          ))}
-                        </select>
-                      </div>
-                    </div>
+                // Update UI Metadata
+                const selectVoiceElem = document.getElementById('voiceSelect');
+                document.getElementById('metaVoice').innerText = selectVoiceElem.options[selectVoiceElem.selectedIndex].text;
+                document.getElementById('metaVibe').innerText = vibeKey;
 
-                    <div className="space-y-6">
-                      <h3 className="text-sm font-bold text-slate-800 flex items-center border-b border-slate-100 pb-3">
-                        <i className="fa-solid fa-sliders text-indigo-500 mr-2"></i> Pengaturan Audio
-                      </h3>
-                      
-                      <div className="space-y-2">
-                        <div className="flex justify-between text-xs font-semibold text-slate-600">
-                          <label>Kecepatan Bicara</label>
-                          <span className="bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded-md">{speed}x</span>
-                        </div>
-                        <input 
-                          type="range" min="0.5" max="2.0" step="0.1" 
-                          value={speed} onChange={(e) => setSpeed(Number(e.target.value))}
-                          className="w-full accent-indigo-600"
-                        />
-                      </div>
+                // Setup Download Buttons
+                setupDownloads(wavBlob, "NusantaraVoice_" + vibeKey + ".wav");
 
-                      <div className="space-y-2">
-                        <div className="flex justify-between text-xs font-semibold text-slate-600">
-                          <label>Pitch Suara</label>
-                          <span className="bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded-md">{pitch > 0 ? `+${pitch}` : pitch}</span>
-                        </div>
-                        <input 
-                          type="range" min="-2" max="2" step="0.5" 
-                          value={pitch} onChange={(e) => setPitch(Number(e.target.value))}
-                          className="w-full accent-indigo-600"
-                        />
-                      </div>
+                // Show Output Card
+                outputCard.classList.remove('hidden');
+                outputCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                
+                // Setup Audio Player Visuals
+                setupAudioPlayer();
 
-                      <div className="space-y-2">
-                        <div className="flex justify-between text-xs font-semibold text-slate-600">
-                          <label>Tingkat Ekspresi</label>
-                          <span className="bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded-md">{expression}%</span>
-                        </div>
-                        <input 
-                          type="range" min="0" max="100" step="1" 
-                          value={expression} onChange={(e) => setExpression(Number(e.target.value))}
-                          className="w-full accent-indigo-600"
-                        />
-                      </div>
-                    </div>
-                  </section>
+                showMessage("Audio berhasil dibuat!", 'success');
+            } catch (err) {
+                console.error(err);
+                showMessage(err.message || "Terjadi kesalahan saat memproses audio.");
+            } finally {
+                resetGenerateBtn();
+            }
+        });
 
-                  <button
-                    onClick={handleGenerate}
-                    disabled={isLoading}
-                    className={`w-full py-4 rounded-2xl text-white font-bold text-lg flex items-center justify-center gap-3 transition-all ${
-                      isLoading ? 'bg-indigo-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700 hover:shadow-xl hover:shadow-indigo-200 active:scale-[0.98]'
-                    }`}
-                  >
-                    {isLoading ? (
-                      <React.Fragment>
-                        <i className="fa-solid fa-rotate-right animate-spin text-xl"></i>
-                        Sedang membuat suara...
-                      </React.Fragment>
-                    ) : (
-                      <React.Fragment>
-                        <i className="fa-solid fa-file-audio text-xl"></i>
-                        Generate Audio Sekarang
-                      </React.Fragment>
-                    )}
-                  </button>
-
-                  <div className="bg-blue-50/80 border border-blue-100 text-blue-800 p-4 rounded-2xl flex items-start gap-3 text-sm">
-                    <i className="fa-solid fa-circle-info text-xl text-blue-500 mt-0.5 shrink-0"></i>
-                    <p className="leading-relaxed">
-                      Sistem akan memetakan preferensi karakter lokal (seperti "Wanita Dewasa") ke profil suara model AI terdekat. Pastikan Anda memasukkan API Key yang benar saat di-hosting.
-                    </p>
-                  </div>
-
-                </div>
-
-                {/* Right Column: Output & Player */}
-                <div className="lg:col-span-5 space-y-6">
-                  <div className="bg-[#1a2332] text-white rounded-3xl shadow-xl p-6 md:p-8 flex flex-col h-full min-h-[450px] relative overflow-hidden">
-                    
-                    <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
-                    
-                    <h2 className="text-lg font-bold flex items-center gap-3 mb-6 border-b border-slate-700/50 pb-4 relative z-10">
-                      <i className="fa-solid fa-wave-square text-indigo-400"></i> Output Audio
-                    </h2>
-
-                    {error && (
-                      <div className="bg-red-500/10 text-red-300 p-4 rounded-xl flex items-center gap-3 text-sm mb-4 border border-red-500/20 relative z-10">
-                        <i className="fa-solid fa-triangle-exclamation text-xl shrink-0"></i>
-                        <p>{error}</p>
-                      </div>
-                    )}
-
-                    {!audioUrl && !isLoading && !error && (
-                      <div className="flex-1 flex flex-col items-center justify-center text-slate-400 opacity-60 relative z-10">
-                        <i className="fa-solid fa-file-audio text-6xl mb-5 text-slate-600"></i>
-                        <p className="text-center text-sm px-4">Audio akan muncul di sini setelah Anda menekan tombol Generate.</p>
-                      </div>
-                    )}
-
-                    {isLoading && (
-                      <div className="flex-1 flex flex-col items-center justify-center text-indigo-300 relative z-10">
-                        <div className="flex items-center gap-2 mb-6">
-                          <div className="w-2 h-8 bg-indigo-500 animate-pulse rounded-full"></div>
-                          <div className="w-2 h-12 bg-indigo-400 animate-pulse delay-75 rounded-full"></div>
-                          <div className="w-2 h-16 bg-indigo-300 animate-pulse delay-150 rounded-full"></div>
-                          <div className="w-2 h-12 bg-indigo-400 animate-pulse delay-200 rounded-full"></div>
-                          <div className="w-2 h-8 bg-indigo-500 animate-pulse delay-300 rounded-full"></div>
-                        </div>
-                        <p className="text-sm font-semibold animate-pulse tracking-wide">Memproses AI Text-to-Speech...</p>
-                      </div>
-                    )}
-
-                    {audioUrl && (
-                      <div className="flex flex-col flex-1 relative z-10">
-                        <audio ref={audioRef} src={audioUrl} />
-                        
-                        <div className="h-32 bg-[#0f1523] rounded-2xl mb-8 flex items-center justify-center overflow-hidden border border-slate-700/50 relative shadow-inner">
-                           {isPlaying ? (
-                             <div className="flex items-center justify-center gap-1 w-full px-4 h-full">
-                               {[...Array(40)].map((_, i) => (
-                                 <div 
-                                   key={i} 
-                                   className="w-1.5 bg-indigo-500 rounded-full"
-                                   style={{ 
-                                     height: `${Math.max(15, Math.random() * 100)}%`,
-                                     transition: 'height 0.1s ease-in-out'
-                                   }}
-                                 />
-                               ))}
-                             </div>
-                           ) : (
-                             <div className="flex items-center justify-center gap-1 w-full px-4 h-full opacity-30">
-                               {[...Array(40)].map((_, i) => (
-                                 <div key={i} className="w-1.5 h-2 bg-slate-500 rounded-full" />
-                               ))}
-                             </div>
-                           )}
-                        </div>
-
-                        <div className="bg-white/5 rounded-2xl p-5 mb-6 backdrop-blur-sm border border-white/10">
-                          <div className="flex items-center justify-between mb-5">
-                            <button 
-                              onClick={togglePlayPause}
-                              className="w-14 h-14 bg-indigo-500 hover:bg-indigo-400 rounded-full flex items-center justify-center text-white transition-transform active:scale-90 shadow-lg shadow-indigo-500/30"
-                            >
-                              {isPlaying ? <i className="fa-solid fa-pause text-xl"></i> : <i className="fa-solid fa-play text-xl ml-1"></i>}
-                            </button>
-
-                            <div className="flex items-center gap-3 bg-black/20 rounded-xl px-4 py-2 border border-white/5">
-                              <i className="fa-solid fa-volume-high text-slate-300"></i>
-                              <input 
-                                type="range" min="0" max="100" 
-                                value={volume}
-                                onChange={(e) => {
-                                  setVolume(Number(e.target.value));
-                                  if(audioRef.current) audioRef.current.volume = e.target.value / 100;
-                                }}
-                                className="w-24 accent-indigo-400"
-                              />
-                            </div>
-                          </div>
-
-                          <div className="flex items-center gap-3 text-xs text-slate-300 font-mono font-medium">
-                            <span>{formatTime(currentTime)}</span>
-                            <input 
-                              type="range" min="0" max={duration || 0} step="0.01"
-                              value={currentTime}
-                              onChange={handleSeek}
-                              className="flex-1 accent-indigo-400 h-2 bg-slate-700 rounded-lg cursor-pointer appearance-none"
-                            />
-                            <span>{formatTime(duration)}</span>
-                          </div>
-                        </div>
-
-                        {audioMeta && (
-                          <div className="bg-white/5 rounded-2xl p-5 text-sm mb-6 flex-1 border border-white/10">
-                            <h3 className="font-semibold text-slate-200 mb-3 pb-2 border-b border-white/10">Informasi File</h3>
-                            <div className="grid grid-cols-2 gap-y-3 gap-x-4 text-slate-300 text-xs">
-                              <div><span className="text-slate-500 block mb-1">Persona:</span><span className="font-medium text-white">{persona}</span></div>
-                              <div><span className="text-slate-500 block mb-1">Vibe:</span><span className="font-medium text-white">{audioMeta.vibe}</span></div>
-                              <div><span className="text-slate-500 block mb-1">Format:</span><span className="font-medium text-white">{audioMeta.format}</span></div>
-                              <div><span className="text-slate-500 block mb-1">Sample Rate:</span><span className="font-medium text-white">{audioMeta.sampleRate}</span></div>
-                            </div>
-                          </div>
-                        )}
-
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-auto">
-                          <button 
-                            onClick={handleDownloadWav}
-                            className="flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 py-3.5 rounded-xl text-sm font-semibold transition-colors"
-                          >
-                            <i className="fa-solid fa-download"></i> Download WAV
-                          </button>
-                          <button 
-                            onClick={() => handleGenerate()}
-                            className="flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-500 py-3.5 rounded-xl text-sm font-semibold transition-colors"
-                          >
-                            <i className="fa-solid fa-rotate-right"></i> Generate Ulang
-                          </button>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </main>
-
-              {/* --- FOOTER MODERN --- */}
-              <footer className="max-w-6xl mx-auto mt-12 px-2">
-                <div className="bg-white rounded-[2rem] border border-slate-200 p-6 md:p-8 shadow-sm flex flex-col md:flex-row items-center justify-between gap-6">
-                  
-                  <div className="flex flex-col items-center md:items-start gap-1">
-                    <p className="text-slate-500 text-sm font-medium flex items-center gap-1.5">
-                      Dibuat dengan <span className="text-red-500 animate-pulse text-lg">❤️</span> oleh
-                    </p>
-                    <span className="text-2xl font-black bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 tracking-tight">
-                      Arom Kobama
-                    </span>
-                  </div>
-                  
-                  <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
-                    <a 
-                      href="https://tiktok.com/@aromkobama" 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="w-full sm:w-auto flex items-center justify-center gap-2 text-slate-700 hover:text-white hover:bg-slate-900 transition-all duration-300 bg-slate-50 border border-slate-200 px-6 py-3 rounded-2xl text-sm font-bold group"
-                    >
-                      <i className="fa-brands fa-tiktok text-xl"></i>
-                      <span>TikTok</span>
-                    </a>
-                    
-                    <a 
-                      href="https://instagram.com/aromkobama" 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="w-full sm:w-auto flex items-center justify-center gap-2 text-slate-700 hover:text-white hover:border-transparent transition-all duration-300 bg-slate-50 border border-slate-200 px-6 py-3 rounded-2xl text-sm font-bold hover:bg-gradient-to-tr hover:from-amber-500 hover:via-pink-500 hover:to-fuchsia-600"
-                    >
-                      <i className="fa-brands fa-instagram text-xl"></i>
-                      <span>Instagram</span>
-                    </a>
-                  </div>
-
-                </div>
-              </footer>
-
-            </div>
-          );
+        function resetGenerateBtn() {
+            generateBtn.disabled = false;
+            generateBtn.innerHTML = `<i data-lucide="sparkles" class="w-5 h-5 group-hover:animate-pulse"></i><span>Generate Audio</span>`;
+            lucide.createIcons();
         }
 
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
+        // Player Logic
+        function setupAudioPlayer() {
+            // Reset UI
+            playIcon.classList.remove('hidden');
+            pauseIcon.classList.add('hidden');
+            seekSlider.value = 0;
+            
+            // Wait for metadata loaded to get duration
+            nativeAudio.addEventListener('loadedmetadata', () => {
+                if (nativeAudio.duration === Infinity) {
+                    nativeAudio.currentTime = 1e101;
+                    nativeAudio.addEventListener('timeupdate', function getDuration() {
+                        this.currentTime = 0;
+                        durationDisplay.innerText = formatTime(nativeAudio.duration);
+                        nativeAudio.removeEventListener('timeupdate', getDuration);
+                    });
+                } else {
+                    durationDisplay.innerText = formatTime(nativeAudio.duration);
+                }
+            });
+
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                analyser = audioCtx.createAnalyser();
+                analyser.fftSize = 256;
+                source = audioCtx.createMediaElementSource(nativeAudio);
+                source.connect(analyser);
+                analyser.connect(audioCtx.destination);
+                drawWaveform();
+            }
+        }
+
+        // Play/Pause Interaction
+        playPauseBtn.addEventListener('click', () => {
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            if (nativeAudio.paused) {
+                nativeAudio.play();
+                playIcon.classList.add('hidden');
+                pauseIcon.classList.remove('hidden');
+            } else {
+                nativeAudio.pause();
+                playIcon.classList.remove('hidden');
+                pauseIcon.classList.add('hidden');
+            }
+        });
+
+        // Audio Events
+        nativeAudio.addEventListener('timeupdate', () => {
+            currentTimeDisplay.innerText = formatTime(nativeAudio.currentTime);
+            if (nativeAudio.duration) {
+                const progress = (nativeAudio.currentTime / nativeAudio.duration) * 100;
+                seekSlider.value = progress;
+            }
+        });
+
+        nativeAudio.addEventListener('ended', () => {
+            playIcon.classList.remove('hidden');
+            pauseIcon.classList.add('hidden');
+            seekSlider.value = 0;
+            currentTimeDisplay.innerText = "00:00";
+        });
+
+        // Seeking
+        seekSlider.addEventListener('input', (e) => {
+            if (nativeAudio.duration) {
+                const seekTime = (e.target.value / 100) * nativeAudio.duration;
+                nativeAudio.currentTime = seekTime;
+            }
+        });
+
+        // Volume
+        volumeSlider.addEventListener('input', (e) => {
+            nativeAudio.volume = e.target.value;
+        });
+
+        // Realtime Waveform Visualization
+        function drawWaveform() {
+            animationId = requestAnimationFrame(drawWaveform);
+            
+            const width = canvas.clientWidth;
+            const height = canvas.clientHeight;
+            if (canvas.width !== width || canvas.height !== height) {
+                canvas.width = width;
+                canvas.height = height;
+            }
+
+            const bufferLength = analyser.frequencyBinCount;
+            const dataArray = new Uint8Array(bufferLength);
+            analyser.getByteFrequencyData(dataArray);
+
+            canvasCtx.clearRect(0, 0, width, height);
+
+            const barWidth = (width / bufferLength) * 2.5;
+            let barHeight;
+            let x = 0;
+
+            for (let i = 0; i < bufferLength; i++) {
+                barHeight = dataArray[i] / 255 * height;
+
+                const g = 100 + (dataArray[i] / 2);
+                const b = 200 + (dataArray[i] / 4);
+                
+                canvasCtx.fillStyle = `rgb(99, 102, 241)`;
+                if(nativeAudio.paused) {
+                    canvasCtx.fillStyle = `rgb(51, 65, 85)`;
+                    barHeight = 2;
+                } else {
+                     canvasCtx.fillStyle = `rgba(99, 102, 241, ${0.4 + (barHeight/height)*0.6})`;
+                }
+
+                canvasCtx.beginPath();
+                canvasCtx.roundRect(x, height - barHeight, barWidth - 1, barHeight, [2, 2, 0, 0]);
+                canvasCtx.fill();
+
+                x += barWidth;
+            }
+        }
+
+        setTimeout(() => {
+            canvas.width = canvas.clientWidth;
+            canvas.height = canvas.clientHeight;
+            canvasCtx.fillStyle = `rgb(51, 65, 85)`;
+            canvasCtx.beginPath();
+            canvasCtx.roundRect(0, canvas.height/2 - 1, canvas.width, 2, [1, 1, 1, 1]);
+            canvasCtx.fill();
+        }, 100);
+
+        function setupDownloads(blob, filename) {
+            const wavBtn = document.getElementById('downloadWavBtn');
+            const mp3Btn = document.getElementById('downloadMp3Btn');
+
+            wavBtn.onclick = () => triggerDownload(blob, filename);
+            
+            mp3Btn.onclick = () => {
+                showMessage("Fitur ekspor murni menggunakan WAV kualitas tinggi (uncompressed) untuk menjaga kualitas.", 'success');
+                triggerDownload(blob, filename.replace('.wav', '_hq.wav'));
+            };
+        }
+
+        function triggerDownload(blob, filename) {
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+        }
+
     </script>
 </body>
 </html>
