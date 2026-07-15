@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SulapFoto Ai - Magic Studio</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="app-container">
+        
+        <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
+
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-box"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+                <div class="header-text">
+                    <h2>SulapFoto Ai</h2>
+                    <p>Magic Studio v1</p>
+                </div>
+            </div>
+
+            <div class="menu-list">
+                <div class="menu-item active"><i class="fa-solid fa-house main-icon"></i> Beranda</div>
+
+                <div class="menu-category">EDITING CEPAT</div>
+                <div class="menu-item"><i class="fa-solid fa-object-ungroup main-icon"></i> Hapus Background</div>
+                <div class="menu-item"><i class="fa-solid fa-eraser main-icon"></i> Magic Eraser</div>
+                <div class="menu-item"><i class="fa-solid fa-magnifying-glass-chart main-icon"></i> Perjelas Foto (HD)</div>
+
+                <div class="menu-category">KOMERSIAL</div>
+                <div class="menu-item"><i class="fa-solid fa-shirt main-icon"></i> Foto Fashion</div>
+                <div class="menu-item">
+                    <i class="fa-solid fa-layer-group main-icon"></i> Buat Mockup 
+                    <i class="fa-solid fa-gem badge-pro"></i>
+                </div>
+                <div class="menu-item"><i class="fa-solid fa-font main-icon"></i> Buat Banner</div>
+                <div class="menu-item"><i class="fa-solid fa-images main-icon"></i> Buat Carousel</div>
+
+                <div class="menu-category">GAYA HIDUP</div>
+                <div class="menu-item"><i class="fa-regular fa-heart main-icon"></i> Pre-Wedding</div>
+                <div class="menu-item"><i class="fa-regular fa-user main-icon"></i> Foto Model</div>
+                <div class="menu-item"><i class="fa-solid fa-camera main-icon"></i> Fotografer</div>
+                <div class="menu-item">
+                    <i class="fa-solid fa-scissors main-icon"></i> Barbershop
+                    <i class="fa-solid fa-gem badge-pro"></i>
+                </div>
+
+                <div class="menu-category">DESAIN & ILUSTRASI</div>
+                <div class="menu-item"><i class="fa-solid fa-house main-icon"></i> Desain Rumah</div>
+                <div class="menu-item"><i class="fa-solid fa-pen-nib main-icon"></i> Sketsa Gambar</div>
+                <div class="menu-item"><i class="fa-solid fa-palette main-icon"></i> Art & Karikatur</div>
+
+                <div class="menu-category">AUDIO & TEKS</div>
+                <div class="menu-item"><i class="fa-solid fa-microphone-lines main-icon"></i> TTS Maker</div>
+                <div class="menu-item"><i class="fa-solid fa-wave-square main-icon"></i> Clone Suara <span class="badge-new">NEW</span></div>
+                <div class="menu-item"><i class="fa-solid fa-pen-to-square main-icon"></i> Copywriting AI</div>
+
+                <div class="menu-category">PENGATURAN</div>
+                <div class="menu-item"><i class="fa-solid fa-circle-user main-icon"></i> Akun Saya</div>
+                <div class="menu-item"><i class="fa-solid fa-circle-question main-icon"></i> Pusat Bantuan</div>
+            </div>
+        </div>
+
+        <div class="main-wrapper">
+            
+            <header>
+                <div class="header-left">
+                    <i class="fa-solid fa-bars menu-toggle" onclick="toggleMenu()"></i>
+                    <h1 id="headerTitle">Beranda</h1>
+                </div>
+                
+                <div class="header-right">
+                    <button class="btn-upgrade"><i class="fa-solid fa-bolt"></i> Upgrade Pro</button>
+                    <div class="icon-btn"><i class="fa-regular fa-bell"></i><div class="dot"></div></div>
+                    <div class="user-profile"></div>
+                </div>
+            </header>
+
+            <div class="content-area">
+                
+                <div class="welcome-screen" id="welcomeScreen">
+                    <h2>Selamat Datang di SulapFoto Ai! ✨</h2>
+                    <p class="desc">
+                        Aplikasi asisten kreatif pintar Anda. Manfaatkan Kecerdasan Buatan (AI) untuk mempercepat pekerjaan visual dan audio Anda dalam hitungan detik dengan hasil profesional.
+                    </p>
+                    
+                    <div class="info-grid">
+                        <div class="info-card">
+                            <i class="fa-solid fa-wand-magic-sparkles" style="color: #3b82f6;"></i>
+                            <h4>Modifikasi Tanpa Batas</h4>
+                            <p>Ubah gaya pakaian dan ganti latar belakang lingkungan pada foto secara otomatis, tanpa mengubah struktur dan ciri khas wajah asli.</p>
+                        </div>
+                        <div class="info-card">
+                            <i class="fa-solid fa-layer-group" style="color: #a855f7;"></i>
+                            <h4>Komersial & Desain</h4>
+                            <p>Buat mockup otomatis, banner iklan, hingga sketsa arsitektur dengan presisi tinggi.</p>
+                        </div>
+                        <div class="info-card">
+                            <i class="fa-solid fa-microphone-lines" style="color: #f59e0b;"></i>
+                            <h4>Studio Audio & Teks</h4>
+                            <p>Ubah teks naskah Anda menjadi suara manusia natural (TTS) atau gunakan AI untuk menulis copy iklan yang menarik.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tool-screen" id="toolScreen">
+                    <h3 id="toolTitleText" style="margin-bottom: 5px; color: #062329; font-size: 1.5rem;">Judul Tool</h3>
+                    <p id="toolSubtitleText" class="subtitle">Deskripsi fungsi alat akan muncul di sini.</p>
+                    
+                    <div class="dummy-box">
+                        <i class="fa-solid fa-cloud-arrow-up" id="toolIcon" style="font-size: 3rem; margin-bottom:15px; color: #0bb87c;"></i>
+                        <p id="toolDescText" style="font-size: 1.1rem; font-weight: 500;">Area workspace (unggah file/input teks) akan tampil di sini.</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <script src="script.js"></script>
+
+</body>
+</html>
